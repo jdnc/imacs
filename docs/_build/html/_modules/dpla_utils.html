@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dpla_utils &mdash; imacs 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="imacs 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">imacs 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for dpla_utils</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:Author: Madhura Parikh (madhuraparikh@gmail.com)</span>
+
+<span class="sd">This module contains basic utility functions for querying dp.la.</span>
+<span class="sd">Also supports interactions with a mongodb database</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pymongo</span>
+
+<span class="c"># define some common variables that can be used globally</span>
+<span class="n">collections_url</span> <span class="o">=</span> <span class="s">&#39;http://api.dp.la/v2/collections&#39;</span>
+<span class="n">items_url</span> <span class="o">=</span> <span class="s">&#39;http://api.dp.la/v2/items&#39;</span>
+
+
+<div class="viewcode-block" id="send_request"><a class="viewcode-back" href="../index.html#dpla_utils.send_request">[docs]</a><span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function sends a HTTP get request to the given url and returns the corresponding </span>
+<span class="sd">    response parsed as json.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url : str</span>
+<span class="sd">        The url of the remote server.</span>
+<span class="sd">    payload : dict</span>
+<span class="sd">        The dictionary representing the params of the HTTP request</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    json parse of `Requests.response` object.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; payload = { &#39;api_key&#39; : 000000 }</span>
+<span class="sd">    &gt;&gt;&gt; dpla_json = send_request(collections_url, payload)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exception</span><span class="o">.</span><span class="n">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s">&quot;HTTP request failed.&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="dpla_fetch"><a class="viewcode-back" href="../index.html#dpla_utils.dpla_fetch">[docs]</a><span class="k">def</span> <span class="nf">dpla_fetch</span><span class="p">(</span><span class="n">api_key</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">search_type</span><span class="o">=</span><span class="s">&#39;items&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches the specified number of resources with simple search by default, and</span>
+<span class="sd">    supports more selective queries by optional arguments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    api_key : str</span>
+<span class="sd">        The api key generated from dp.la.</span>
+<span class="sd">    count : int</span>
+<span class="sd">        The number of resources to be fetched.</span>
+<span class="sd">    search_type : str, optional</span>
+<span class="sd">        the type of resource to fetch. Should be either &#39;items&#39; or &#39;collections&#39;.</span>
+<span class="sd">        Defaults to &#39;items&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dpla_results : dict</span>
+<span class="sd">        The collections from dpla in JSON format.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; api_key = &#39;000000&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; # fetches the first 1200 items</span>
+<span class="sd">    &gt;&gt;&gt; items = dpla_fetch(api_key, 1200) </span>
+
+<span class="sd">    &gt;&gt;&gt; # fetches all items that mention kitten somewhere</span>
+<span class="sd">    &gt;&gt;&gt; items = dpla_fetch(api_key, q=&#39;kitten*&#39;) </span>
+
+<span class="sd">    &gt;&gt;&gt; # for nested fields (that have periods in them) do this</span>
+<span class="sd">    &gt;&gt;&gt; conditions = { &#39;sourceResource.collection.title&#39; : &#39;Smith&#39; }</span>
+<span class="sd">    &gt;&gt;&gt; # this will return all items from the colletion titled Smith</span>
+<span class="sd">    &gt;&gt;&gt; items = dpla_fetch(api_key, **conditions)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># first of all set the page_size</span>
+    <span class="n">page_size</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">final_page_size</span> <span class="o">=</span> <span class="n">count</span> <span class="o">%</span> <span class="mi">500</span>
+    <span class="n">num_pages</span> <span class="o">=</span> <span class="n">count</span> <span class="o">/</span> <span class="mi">500</span> 
+
+    <span class="c"># now construct the payload dict</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">payload</span><span class="p">[</span><span class="s">&#39;api_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="c"># fetch the query results</span>
+    <span class="k">if</span> <span class="n">search_type</span> <span class="o">==</span> <span class="s">&#39;collections&#39;</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">collections_url</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">items_url</span>
+    <span class="n">json_dics</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">final_page_size</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s">&#39;page_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_page_size</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">send_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="n">json_dics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_pages</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s">&#39;page_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">500</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s">&#39;page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">send_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="n">json_dics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="c"># combine all the results</span>
+    <span class="n">dpla_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dic</span> <span class="ow">in</span> <span class="n">json_dics</span><span class="p">:</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="n">dic</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;docs&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+            <span class="n">dpla_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dpla_results</span>
+
+</div>
+<div class="viewcode-block" id="connect_to_mongodb"><a class="viewcode-back" href="../index.html#dpla_utils.connect_to_mongodb">[docs]</a><span class="k">def</span> <span class="nf">connect_to_mongodb</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Returns connection to a running mongodb server &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">=</span><span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Connected successfully&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conn</span>
+    <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ConnectionFailure</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+       <span class="k">print</span><span class="p">(</span><span class="s">&quot;Could not connect to MongoDB&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">imacs 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Madhura Parikh.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

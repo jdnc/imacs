@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to imacs’s documentation! &mdash; imacs 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="imacs 0.1 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">imacs 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-imacs-s-documentation">
+<h1>Welcome to imacs&#8217;s documentation!<a class="headerlink" href="#welcome-to-imacs-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<span class="target" id="module-dpla_utils"></span><dl class="function">
+<dt id="dpla_utils.connect_to_mongodb">
+<tt class="descclassname">dpla_utils.</tt><tt class="descname">connect_to_mongodb</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/dpla_utils.html#connect_to_mongodb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dpla_utils.connect_to_mongodb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns connection to a running mongodb server</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dpla_utils.dpla_fetch">
+<tt class="descclassname">dpla_utils.</tt><tt class="descname">dpla_fetch</tt><big>(</big><em>api_key</em>, <em>count</em>, <em>search_type='items'</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/dpla_utils.html#dpla_fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dpla_utils.dpla_fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the specified number of resources with simple search by default, and
+supports more selective queries by optional arguments.</p>
+<dl class="docutils">
+<dt>api_key <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>The api key generated from dp.la.</dd>
+<dt>count <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>The number of resources to be fetched.</dd>
+<dt>search_type <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd>the type of resource to fetch. Should be either &#8216;items&#8217; or &#8216;collections&#8217;.
+Defaults to &#8216;items&#8217;.</dd>
+</dl>
+<dl class="docutils">
+<dt>dpla_results <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>The collections from dpla in JSON format.</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">api_key</span> <span class="o">=</span> <span class="s">&#39;000000&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># fetches the first 1200 items</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">items</span> <span class="o">=</span> <span class="n">dpla_fetch</span><span class="p">(</span><span class="n">api_key</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span> 
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># fetches all items that mention kitten somewhere</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">items</span> <span class="o">=</span> <span class="n">dpla_fetch</span><span class="p">(</span><span class="n">api_key</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s">&#39;kitten*&#39;</span><span class="p">)</span> 
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># for nested fields (that have periods in them) do this</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;sourceResource.collection.title&#39;</span> <span class="p">:</span> <span class="s">&#39;Smith&#39;</span> <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># this will return all items from the colletion titled Smith</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">items</span> <span class="o">=</span> <span class="n">dpla_fetch</span><span class="p">(</span><span class="n">api_key</span><span class="p">,</span> <span class="o">**</span><span class="n">conditions</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="dpla_utils.send_request">
+<tt class="descclassname">dpla_utils.</tt><tt class="descname">send_request</tt><big>(</big><em>url</em>, <em>payload</em><big>)</big><a class="reference internal" href="_modules/dpla_utils.html#send_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dpla_utils.send_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function sends a HTTP get request to the given url and returns the corresponding 
+response parsed as json.</p>
+<dl class="docutils">
+<dt>url <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>The url of the remote server.</dd>
+<dt>payload <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>The dictionary representing the params of the HTTP request</dd>
+</dl>
+<p>json parse of <cite>Requests.response</cite> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">payload</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;api_key&#39;</span> <span class="p">:</span> <span class="mo">000000</span> <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dpla_json</span> <span class="o">=</span> <span class="n">send_request</span><span class="p">(</span><span class="n">collections_url</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to imacs&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">imacs 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Madhura Parikh.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
