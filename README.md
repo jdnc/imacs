@@ -1,4 +1,0 @@
-imacs
-=====
-
-aggregate dpla resources
