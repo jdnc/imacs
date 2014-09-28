@@ -20,7 +20,7 @@ items_url = 'http://api.dp.la/v2/items'
 
 def send_request(url, payload):
     """
-    This function sends a HTTP get request to the given url and returns the corresponding 
+    This function sends a HTTP get request to the given url and returns the corresponding
     response parsed as json.
 
     Parameters
@@ -40,9 +40,9 @@ def send_request(url, payload):
     >>> dpla_json = send_request(collections_url, payload)
     """
     try:
-        response = requests.send(url, params=payload)
+        response = requests.get(url, params=payload)
         return response.json()
-    except requests.exception.Exception:
+    except requests.exceptions.RequestException:
         raise Exception ("HTTP request failed.")
 
 
@@ -71,10 +71,10 @@ def dpla_fetch(api_key, count, search_type='items', **kwargs):
     >>> api_key = '000000'
 
     >>> # fetches the first 1200 items
-    >>> items = dpla_fetch(api_key, 1200) 
+    >>> items = dpla_fetch(api_key, 1200)
 
     >>> # fetches all items that mention kitten somewhere
-    >>> items = dpla_fetch(api_key, q='kitten*') 
+    >>> items = dpla_fetch(api_key, q='kitten*')
 
     >>> # for nested fields (that have periods in them) do this
     >>> conditions = { 'sourceResource.collection.title' : 'Smith' }
@@ -85,7 +85,7 @@ def dpla_fetch(api_key, count, search_type='items', **kwargs):
     # first of all set the page_size
     page_size = 500
     final_page_size = count % 500
-    num_pages = count / 500 
+    num_pages = count / 500
 
     # now construct the payload dict
     payload = dict()
