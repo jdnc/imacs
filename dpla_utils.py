@@ -99,16 +99,18 @@ def dpla_fetch(api_key, count, search_type='items', **kwargs):
     else:
         url = items_url
     json_dics = []
-    if final_page_size:
-        payload['page_size'] = final_page_size
-        response = send_request(url, payload)
-        json_dics.append(response)
-    for i in range(1, num_pages, 1):
+    page_count = 0
+    for i in range(1, num_pages + 1, 1):
         payload['page_size'] = 500
         payload['page'] = i
         response = send_request(url, payload)
         json_dics.append(response)
-
+        page_count = i
+    if final_page_size:
+        payload['page'] = page_count + 1
+        payload['page_size'] = final_page_size
+        response = send_request(url, payload)
+        json_dics.append(response)
     # combine all the results
     dpla_results = []
     for dic in json_dics:
