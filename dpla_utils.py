@@ -17,6 +17,23 @@ import pymongo
 collections_url = 'http://api.dp.la/v2/collections'
 items_url = 'http://api.dp.la/v2/items'
 
+hub_largest_collections = {u'ARTstor': u'3f0e282f7fed21d7790fce877faf11d7', 
+                   u'The New York Public Library': u'a9c225b7b9801ca4a84c63d1ddc64fd2', 
+                   u'David Rumsey': u'ed02f0fad03b7c6ed1000cceb371b8a1', 
+                   u'Digital Commonwealth': u'460c76299e1b0a46afea352b1ab8f556', 
+                   u'Minnesota Digital Library': u'49b09ce719c5184f166920a1a7c1e8cd', 
+                   u'Biodiversity Heritage Library': u'24087df2c58f149a8167a9589cffd830', 
+                   u'National Archives and Records Administration': u'df8bd84b8c0e542746b5d1ed57ab5fee', 
+                   u'Smithsonian Institution': u'3dc8442b62578dd60c322e2599550b12', 
+                   u'Mountain West Digital Library': u'c13cf266db030a231b3d7b0b881dd0d5', 
+                   u'University of Illinois at Urbana-Champaign': u'1cfd29b7fcf303d0becf1145a0d2a2be', 
+                   u'Digital Library of Georgia': u'a72045095d4a687a170a4f300d8e0637', 
+                   u'J. Paul Getty Trust': u'b7b9d0195e635c2536a9b06579a1d990', 
+                   u'The Portal to Texas History': u'eb100f9e44e0369adce25e675b355fc4', 
+                   u'Harvard Library': u'4b7a59eb67cfb3c2dc0df20c7ba08416', 
+                   u'University of Virginia Library': u'a0cd618386dd6e6b3c548d7ba54b7663', 
+                   u'Internet Archive': u'190b7921c442008cb8e538f61cdab6cb', 
+                   u'North Carolina Digital Heritage Center': u'e2c11e2ec8b4c3e5ee39494057a56751'}
 
 def send_request(url, payload):
     """
